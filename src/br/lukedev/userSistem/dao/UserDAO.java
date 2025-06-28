@@ -1,6 +1,7 @@
 package br.lukedev.userSistem.dao;
 
 import br.lukedev.userSistem.model.UserModel;
+//import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +11,8 @@ public class UserDAO {
 
     private long nextId = 1L;
 
-    public UserModel saveUser ( final UserModel user){
+//    @NotNull
+    public UserModel saveUser (final UserModel user){
         user.setId(nextId++);
         UsersModel.add(user);
         return user;
