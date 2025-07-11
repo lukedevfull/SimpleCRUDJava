@@ -19,9 +19,24 @@ public class UserDAO {
         return model;
     }
 
-//    public UserModel updateUser (final UserModel user){
-//        return null;
-//    }
+    public void deleteUser(final Long id){
+        var toDelete = findById(id);
+        models.remove(toDelete);
+    }
+
+    public UserModel updateUser (final UserModel user){
+        var toUpdate = findById(user.getId());
+        if (user.getName() != null){
+            toUpdate.setName(user.getName());
+        }
+        if (user.getEmail() != null){
+            toUpdate.setEmail(user.getEmail());
+        }
+        if (user.getBirthDate() != null){
+            toUpdate.setBirthDate(user.getBirthDate());
+        }
+        return toUpdate;
+    }
 
     public UserModel findById(final Long id){
         var message = String.format("User not found with id: %d", id);

@@ -15,6 +15,11 @@ public class UserModel {
         this.email = email;
         this.birthDate = birthDate;
     }
+    public UserModel(Long id, String name, String email) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+    }
 
     public UserModel() {
     }
