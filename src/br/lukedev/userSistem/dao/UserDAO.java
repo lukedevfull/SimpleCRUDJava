@@ -40,14 +40,18 @@ public class UserDAO {
 
     public UserModel findById(final Long id){
         var message = String.format("User not found with id: %d", id);
-        return
-                models.stream().filter(user -> user.getId()
+
+        var result = models.stream().filter(user -> user.getId()
                     .equals(id))
                     .findFirst()
                     .orElseThrow(() -> new UserNotFoundExeption(message));
+        System.out.println(result.toString());
+        return result;
     }
 
     public List<UserModel> findAll(){
+        for (UserModel model : models)
+            System.out.println(model.toString());
         return new ArrayList<>(models);
     }
 }
