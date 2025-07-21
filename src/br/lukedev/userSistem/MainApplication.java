@@ -16,40 +16,58 @@ public class MainApplication {
     private static Scanner sc = new Scanner(System.in);
     private final static UserDAO dao = new UserDAO();
 
+    static List<String> responseList = new ArrayList<>(List.of("s", "S", "y", "Y"));
+    static List<String> exitList = new ArrayList<>(List.of("n", "N"));
+    static boolean continueInteraction = true;
+
     public static void main(String[] args) {
-        List responseList = new ArrayList<>(List.of("s", "S", "y", "Y"));
-        List exitList = new ArrayList<>(List.of("n", "N"));
         System.out.println("Deseja iniciar?<s/n>");
         String response = sc.nextLine();
-
-        Boolean isResponseInList = responseList.contains(response);
-        Boolean isExitInList = exitList.contains(response);
-        do {
+        
+        if (exitList.contains(response)) {
+            System.out.println("Obrigado por usar o sistema");
+            return;
+        }
+        
+        if (!responseList.contains(response)) {
+            System.out.println("Opção inválida");
+            return;
+        }
+        
+        while (continueInteraction) {
             try {
-                if (isResponseInList) {
-                    MenuOption selectedOption = menu();
-                    UserModel user = collectDataUser(selectedOption);
-                    processMenu(selectedOption, user);
-
-                    System.out.println("Deseja fazer outra interação?<s/n>");
-                    response = sc.nextLine();
+                MenuOption selectedOption = menu();
+                UserModel user = collectDataUser(selectedOption);
+                processMenu(selectedOption, user);
+                
+                System.out.println("Deseja fazer outra interação?<s/n>");
+                String newResponse = sc.nextLine();
+                
+                if (exitList.contains(newResponse)) {
+                    continueInteraction = false;
+                } else if (!responseList.contains(newResponse)) {
+                    System.out.println("Opção inválida");
+                    continueInteraction = false;
                 }
-                if (isExitInList) {
-                    System.out.println("Obrigado por usar o sistema");
-                    System.exit(0);
-                }
+                
             } catch (Exception e) {
-                System.out.println("Opção invalida");
-                System.exit(0);
-            }} while (isResponseInList);
-
+                System.out.println("Erro: " + e.getMessage());
+                continueInteraction = false;
+            }
+        }
+        
         System.out.println("Obrigado por usar o sistema");
     }
-
-    public static UserModel collectDataUser(MenuOption option){
+    public static UserModel collectDataUser(MenuOption option) {
         UserModel user = new UserModel();
-        switch (option){
-            case CREATE, UPDATE ->{
+        UserDAO updateData = new UserDAO();
+        switch (option) {
+            case CREATE, UPDATE -> {
+                if (option == MenuOption.UPDATE) {
+                    System.out.println("Id:");
+                    user.setId(sc.nextLong());
+                    sc.nextLine();
+                }
                 System.out.println("Insira o nome:");
                 user.setName(sc.nextLine());
                 System.out.println("Insira o email:");
@@ -65,6 +83,8 @@ public class MainApplication {
                 user.setBirthDate(birthDate
                         .atStartOfDay()
                         .atOffset(ZoneOffset.UTC));
+
+                break;
             }
             case FIND_BY_ID, DELETE -> {
                 System.out.println("Insira o id:");
@@ -73,12 +93,12 @@ public class MainApplication {
             }
             case EXIT -> {
                 System.out.println("Obrigado por usar o sistema");
-                sc.nextLine(); // Limpa o buffer
-                System.exit(0);
+                break;
             }
         }
         return user;
     }
+
     public static MenuOption menu() {
         System.out.println("\nSeja bem vindo ao cadastro de usuarios");
         System.out.println("Digite o número da opção desejada:");
@@ -96,23 +116,25 @@ public class MainApplication {
             return MenuOption.values()[userInput - 1];
         } catch (Exception e) {
             System.err.println("Erro: " + e.getMessage());
-                sc.nextLine();  // Limpa o buffer em caso de erro
-                return menu();  // Recursão para nova tentativa
+            sc.nextLine();  // Limpa o buffer em caso de erro
+            return menu();  // Recursão para nova tentativa
         }
     }
 
-    public static void processMenu(MenuOption selectedOption, UserModel user){
+    public static void processMenu(MenuOption selectedOption, UserModel user) {
         try {
-            switch (selectedOption){
-                case CREATE -> {
-                    dao.saveUser(user);
-                    System.out.println("Usuário cadastrado com sucesso");
-                    break;
-                }
-                case UPDATE -> {
-                    dao.updateUser(user);
-                    System.out.println("Usuário atualizado com sucesso");
-                    break;
+            switch (selectedOption) {
+                case CREATE, UPDATE -> {
+                    if (selectedOption == MenuOption.CREATE) {
+                        dao.saveUser(user);
+                        System.out.println("Usuário cadastrado com sucesso");
+                        break;
+                    }
+                    if (selectedOption == MenuOption.UPDATE) {
+                        dao.updateUser(user);
+                        System.out.println("Usuário atualizado com sucesso");
+                        break;
+                    }
                 }
                 case DELETE -> {
                     dao.deleteUser(user.getId());
@@ -130,13 +152,14 @@ public class MainApplication {
                     break;
                 }
                 case EXIT -> {
-                    System.out.println("Obrigado por usar o sistema");
-                    break;
+                    continueInteraction = false;
+                    System.exit(0);
                 }
             }
         } catch (Exception e) {
             System.out.println("Opção invalida");
-            }
+            System.exit(0);
         }
     }
+}
 

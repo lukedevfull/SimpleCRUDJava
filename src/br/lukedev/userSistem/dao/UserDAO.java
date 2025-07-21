@@ -26,15 +26,9 @@ public class UserDAO {
 
     public UserModel updateUser (final UserModel user){
         var toUpdate = findById(user.getId());
-        if (user.getName() != null){
-            toUpdate.setName(user.getName());
-        }
-        if (user.getEmail() != null){
-            toUpdate.setEmail(user.getEmail());
-        }
-        if (user.getBirthDate() != null){
-            toUpdate.setBirthDate(user.getBirthDate());
-        }
+        toUpdate.setName(user.getName());
+        toUpdate.setEmail(user.getEmail());
+        toUpdate.setBirthDate(user.getBirthDate());
         return toUpdate;
     }
 
